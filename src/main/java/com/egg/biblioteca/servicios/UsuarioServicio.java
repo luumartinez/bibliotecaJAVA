@@ -2,6 +2,7 @@ package com.egg.biblioteca.servicios;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +42,8 @@ public class UsuarioServicio implements UserDetailsService {
     }
 
     @Transactional
-    public void registrar(MultipartFile archivo, String nombre, String email, String password, String password2) throws MiException {
+    public void registrar(MultipartFile archivo, String nombre, String email, String password, String password2)
+            throws MiException {
         try {
             validar(nombre, email, password, password2);
             Usuario usuario = new Usuario();
@@ -51,7 +54,7 @@ public class UsuarioServicio implements UserDetailsService {
             Imagen imagen = imagenServicio.guardar(archivo);
             usuario.setImagen(imagen);
             usuarioRepositorio.save(usuario);
-            
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -83,6 +86,37 @@ public class UsuarioServicio implements UserDetailsService {
         List<Usuario> usuarios = new ArrayList<>();
         usuarios = usuarioRepositorio.findAll();
         return usuarios;
+    }
+
+    @Transactional
+    public void cambiarRol(UUID id) {
+        Usuario usuario = this.getOne(id);
+        if (usuario != null) {
+            if (usuario.getRol().equals(Rol.ADMIN)) {
+                usuario.setRol(Rol.USER);
+            } else if (usuario.getRol().equals(Rol.USER)) {
+                usuario.setRol(Rol.ADMIN);
+            }
+        }
+    }
+
+    @Transactional
+    public void modificarUsuario(UUID id, String nombre, String email, MultipartFile archivo) {
+        try {
+            Usuario usuario = this.getOne(id);
+            if (usuario != null) {
+                usuario.setNombre(nombre);
+                usuario.setEmail(email);
+                usuario.setRol(Rol.USER);
+                if (archivo != null && !archivo.isEmpty()) {
+                    Imagen imagen = imagenServicio.guardar(archivo);
+                    usuario.setImagen(imagen);
+                }
+                usuarioRepositorio.save(usuario);
+            }
+        } catch (Exception e) {
+            e.getMessage();
+        }
     }
 
     // loadUserByUsername es un método abstracto que se debe sobrescribir para
