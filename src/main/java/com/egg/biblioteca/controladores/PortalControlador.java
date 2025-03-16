@@ -1,10 +1,13 @@
 package com.egg.biblioteca.controladores;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,7 +55,8 @@ public class PortalControlador {
     }
 
     @PostMapping("/registro")
-    public String registro(MultipartFile archivo, @RequestParam String nombre, @RequestParam String email, @RequestParam String password,
+    public String registro(MultipartFile archivo, @RequestParam String nombre, @RequestParam String email,
+            @RequestParam String password,
             @RequestParam String password2, ModelMap modelo) throws MiException {
         try {
             usuarioServicio.registrar(archivo, nombre, email, password, password2);
@@ -63,6 +67,27 @@ public class PortalControlador {
             modelo.put("email", email);
             modelo.put("error", ex.getMessage());
             return "registro.html";
+        }
+    }
+
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    @GetMapping("/perfil/modificar/{id}")
+    public String perfil(ModelMap modelo, @PathVariable UUID id) {
+        Usuario usuario = usuarioServicio.getOne(id);
+        modelo.put("usuario", usuario);
+        return "usuario_modificar.html";
+    }
+    
+    @PostMapping("/perfil/modificar/{id}")
+    public String modificar(@PathVariable UUID id, @RequestParam String nombre, @RequestParam String email,
+            @RequestParam(required = false) MultipartFile archivo, ModelMap modelo) {
+        try {
+            usuarioServicio.modificarUsuario(id, nombre, email, archivo);
+            modelo.put("exito", "El usuario se actualizó correctamente");
+            return "redirect:/inicio";
+        } catch (Exception e) {
+            modelo.put("error", "El usuario no se pudo actualizar");
+            return "redirect:../perfil/modificar/" + id;
         }
     }
 }

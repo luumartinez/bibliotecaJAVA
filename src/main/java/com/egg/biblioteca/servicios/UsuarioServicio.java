@@ -2,7 +2,6 @@ package com.egg.biblioteca.servicios;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -107,7 +105,7 @@ public class UsuarioServicio implements UserDetailsService {
             if (usuario != null) {
                 usuario.setNombre(nombre);
                 usuario.setEmail(email);
-                usuario.setRol(Rol.USER);
+                usuario.setRol(usuario.getRol());
                 if (archivo != null && !archivo.isEmpty()) {
                     Imagen imagen = imagenServicio.guardar(archivo);
                     usuario.setImagen(imagen);
