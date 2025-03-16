@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-    <head th:replace="~{fragments/head :: head}"></head>
+    <head th:replace="~{fragments/head :: head}"> </head>
+
     <body>
         <nav th:replace="~{fragments/navbar :: nav}"></nav>
-
         <header class="header">
             <section class="contenedorMain">
                 <div class="tituloBiblioteca">
                     <a class="navbar-brand" href="#">BIBLIOTECA EGG</a>
                 </div>
+                <div sec:authorize="hasRole('ADMIN')">
+                    <p>Bienvenido, administrador.</p>
                 <div class="container contenedorLibros">
                     <p class="tituloLibros" th:if="${session.usuariosession != null}" th:text=" 'Hola de vuelta '+ ${session.usuariosession.nombre} "></p>
                     <a class="btn btn-xl mt-2 boton">Ver Listado</a>

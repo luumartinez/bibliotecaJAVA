@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,7 +25,6 @@ import com.egg.biblioteca.excepciones.MiException;
 import com.egg.biblioteca.repositorios.UsuarioRepositorio;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioServicio implements UserDetailsService {
@@ -73,9 +73,16 @@ public class UsuarioServicio implements UserDetailsService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Usuario getOne(UUID id) {
         return usuarioRepositorio.getReferenceById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Usuario> listarUsuarios() {
+        List<Usuario> usuarios = new ArrayList<>();
+        usuarios = usuarioRepositorio.findAll();
+        return usuarios;
     }
 
     // loadUserByUsername es un método abstracto que se debe sobrescribir para

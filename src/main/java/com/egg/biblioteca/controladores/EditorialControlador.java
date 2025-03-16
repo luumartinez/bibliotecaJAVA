@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ public class EditorialControlador {
     @Autowired
     EditorialServicio editorialServicio;
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/registrar")
     public String registrar() {
         return "editorial_form.html";
@@ -48,6 +50,7 @@ public class EditorialControlador {
         return "editorial_list.html";
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/modificar/{id}")
     public String modificar(@PathVariable UUID id, ModelMap modelo){
         modelo.put("editorial", editorialServicio.getOne(id));
